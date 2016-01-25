@@ -57,7 +57,7 @@ flag UseGLES2
 
 flag OsAndroid
   description:
-    Compile for Android. This flag goes away when cabal supports os(android).
+    Force a compile for Android.
   default:
     False
 
@@ -615,7 +615,7 @@ library
     CPP
     PatternSynonyms
     ScopedTypeVariables
-  if os(windows) && flag(UseNativeWindowsLibraries)
+  if os(windows) && flag(UseNativeWindowsLibraries) && !flag(OsAndroid)
     if arch(i386)
       cpp-options: "-DCALLCONV=stdcall"
     else
@@ -629,10 +629,11 @@ library
       cc-options: "-DUSE_DLSYM"
     else
       cc-options: "-DUSE_GLXGETPROCADDRESS"
-    if os(darwin)
+    if os(darwin) && !flag(OsAndroid)
       cpp-options: "-DHANDLE_IS_POINTER"
       frameworks: OpenGL
     else
+      -- Assume that if we're on iOS that we're not compiling for Android
       if os(ios)
         frameworks: OpenGLES
       else
